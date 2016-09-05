@@ -5,7 +5,6 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,6 @@ public class Assets {
     public static Texture bear,bunny,carrot,lemon,panda,pig;
     public static Sound sound;
     public static List<Texture> animalTextures;
-    public static List<Sprite> animalSprites;
 
     public static void load(){
         loadImages();
@@ -58,19 +56,6 @@ public class Assets {
         animalTextures.add(carrot);
         animalTextures.add(bunny);
         animalTextures.add(bear);
-
-        animalSprites = new ArrayList<Sprite>();
-
-        for (Texture texture:animalTextures){
-            Sprite sprite = new Sprite(texture);
-            animalSprites.add(sprite);
-        }
-        /*"pig",
-        "lemon",
-        "panda",
-        "carrot",
-        "bunny",
-        "bear"*/
     }
 
 
