@@ -3,9 +3,10 @@ package actor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import handler.AnimalFactory;
 import handler.Assets;
@@ -16,29 +17,40 @@ import handler.Assets;
 public class BoardActor extends Image {
     private final int rows;
     private final int cols;
-    private AnimalActor [][] animalActors;
+	private final int H;
+	private final int W;
+	private Stage stage;
+	private AnimalActor[][] animalActors;
+	private AnimalActor selectedAnimal;
 
-    public BoardActor(int rows,int cols) {
+	public BoardActor(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
-
-
+	    this.W = rows * Assets.panda.getWidth();
+	    this.H = cols * Assets.panda.getHeight();
     }
 
-    public void initialize(SpriteBatch batch) {
-
+    public void initialize() {
         animalActors = new AnimalActor[rows][cols];
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                AnimalActor actor = AnimalFactory.getRandomizedAnimal(i, j);
+                AnimalActor actor = AnimalFactory.getRandomizedAnimal(i, j, this);
                 animalActors[i][j] =  actor;
+//	            stage.addActor(actor);
             }
         }
-        draw(batch);
     }
 
-    public void draw(SpriteBatch batch) {
+	public void draw(){
+		this.stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+		Gdx.input.setInputProcessor(stage);
+
+		drawBoard();
+		stage.draw();
+	}
+
+	private void drawBoard() {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         ShapeRenderer renderer = new ShapeRenderer();
@@ -46,24 +58,38 @@ public class BoardActor extends Image {
 
         renderer.setColor(new Color(1,1,1,0.3f));
 
-        float W = rows * Assets.panda.getWidth();
-        float H = cols * Assets.panda.getHeight();
-
-        setOrigin((Gdx.graphics.getWidth() - W)/2.0f, (Gdx.graphics.getHeight() - H) /2.0f);
+//        setOrigin((Gdx.graphics.getWidth() - W)/2.0f, (Gdx.graphics.getHeight() - H) /2.0f);
         renderer.rect(getOriginX(), getOriginY(), W,H);
 
         renderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
-        batch.begin();
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                animalActors[i][j].draw(batch, getOriginX(), getOriginY());
-            }
-        }
-        batch.end();
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+//				animalActors[i][j].setOrigin(getOriginX(), getOriginY());
+				stage.addActor(animalActors[i][j]);
+			}
+		}
     }
 
+	public void setSelectedAnimal(AnimalActor selectedAnimal) {
+		this.selectedAnimal = selectedAnimal;
+	}
 
+	public void touchUp(int row, int col) {
+		AnimalActor otherAnimal = animalActors[row][col];
+		if (selectedAnimal != null && selectedAnimal != otherAnimal){
+//			float tmpX = selectedAnimal.getX();
+//			float tmpY = selectedAnimal.getY();
+////			float tmpOX = selectedAnimal.getOriginX();
+////			float tmpOY = selectedAnimal.getOriginY();
+//			selectedAnimal.setX(otherAnimal.getX());
+//			selectedAnimal.setY(otherAnimal.getY());
+////			selectedAnimal.setOrigin(otherAnimal.getOriginX(), otherAnimal.getOriginY());
+//			otherAnimal.setX(tmpX);
+//			otherAnimal.setY(tmpY);
+////			otherAnimal.setOrigin(tmpOX, tmpOY);
+		}
+		animalActors[row][col] = AnimalFactory.getRandomizedAnimal(row, col, this);
+	}
 }

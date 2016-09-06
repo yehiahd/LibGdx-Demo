@@ -19,15 +19,17 @@ public class Assets {
     public static Sound sound;
     public static List<Texture> animalTextures;
 
+	// Pre-Loads all the required assets needed throughout the whole app life-cycle.
     public static void load(){
         loadImages();
         loadSounds();
     }
 
     private static void loadSounds() {
-        sound = Gdx.audio.newSound(Gdx.files.internal("data/sounds/3.wav"));
+        sound = Gdx.audio.newSound(getFile("data/sounds/3.wav"));
     }
 
+	// StackOverFlow'ed...apparently.
     private static Pixmap getPixMap(FileHandle fileHandle){
         Pixmap pixmap200 = new Pixmap(fileHandle);
         Pixmap pixmap100 = new Pixmap(40, 40, pixmap200.getFormat());
@@ -39,17 +41,17 @@ public class Assets {
     }
 
     private static void loadImages(){
-        bg = new Texture(Gdx.files.internal("data/images/background_tile.png"));
-        centerBottom = new Texture(Gdx.files.internal("data/images/center_bottom.png"));
-        logo = new Texture(Gdx.files.internal("data/images/logo.png"));
-        bear = new Texture(getPixMap(Gdx.files.internal("data/images/game_bear.png")));
-        bunny = new Texture(getPixMap(Gdx.files.internal("data/images/game_bunny.png")));
-        carrot = new Texture(getPixMap(Gdx.files.internal("data/images/game_carrot.png")));
-        lemon = new Texture(getPixMap(Gdx.files.internal("data/images/game_lemon.png")));
-        panda = new Texture(getPixMap(Gdx.files.internal("data/images/game_panda.png")));
-        pig = new Texture(getPixMap(Gdx.files.internal("data/images/game_piratePig.png")));
+        bg = new Texture(getFile("data/images/background_tile.png"));
+        centerBottom = new Texture(getFile("data/images/center_bottom.png"));
+	    logo = new Texture(getFile("data/images/logo.png"));
+	    pig = new Texture(getPixMap(getFile("data/images/game_piratePig.png")));
+	    lemon = new Texture(getPixMap(getFile("data/images/game_lemon.png")));
+	    panda = new Texture(getPixMap(getFile("data/images/game_panda.png")));
+	    carrot = new Texture(getPixMap(getFile("data/images/game_carrot.png")));
+	    bunny = new Texture(getPixMap(getFile("data/images/game_bunny.png")));
+	    bear = new Texture(getPixMap(getFile("data/images/game_bear.png")));
 
-        animalTextures = new ArrayList<Texture>();
+	    animalTextures = new ArrayList<Texture>();
         animalTextures.add(pig);
         animalTextures.add(lemon);
         animalTextures.add(panda);
@@ -58,5 +60,7 @@ public class Assets {
         animalTextures.add(bear);
     }
 
-
+	public static FileHandle getFile(String path) {
+		return Gdx.files.internal(path);
+	}
 }
