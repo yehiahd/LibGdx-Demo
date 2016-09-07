@@ -9,23 +9,24 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
+import handler.Assets;
+
 /**
  * Created by yehia on 05/09/16.
  */
 public class AnimalActor extends Image {
 
-    private Texture texture;
 	private BoardActor board;
 	private int row;
 	private int col;
-    private String type;
+    private int typeID;
 
-    public AnimalActor(BoardActor board, int row, int col, String type, Texture texture){
+    public AnimalActor(BoardActor board, int row, int col, int typeID){
 	    this.board = board;
 	    this.row=row;
         this.col=col;
-        this.type = type;
-        this.texture = texture;
+        this.typeID = typeID;
+	    prepareListener();
     }
 
 	private void prepareListener() {
@@ -37,7 +38,7 @@ public class AnimalActor extends Image {
 
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				Gdx.app.log("touchDown: ", String.format("(%s, %s), %s, button: %s", x, y, pointer, button));
+//				Gdx.app.log("touchDown: ", String.format("(%s, %s), %s, button: %s", x, y, pointer, button));
 //				if (event.getTarget() instanceof AnimalActor)
 //					Gdx.app.log("ashraf", "ashroofa");
 //				else
@@ -48,14 +49,13 @@ public class AnimalActor extends Image {
 
 			@Override
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-				Gdx.app.log("touchUp: ", String.format("(%s, %s) (%s, %s), %s", x, y, row, col, pointer, button));
-//				if (y < -10)
-					board.touchUp(0, 0);
+//				Gdx.app.log("touchUp: ", String.format("(%s, %s) (%s, %s), %s", x, y, row, col, pointer, button));
 			}
 
 			@Override
 			public void touchDragged(InputEvent event, float x, float y, int pointer) {
-//				Gdx.app.log("touchDragged: ", String.format("(%f, %f), %d", x, y, pointer));
+				Gdx.app.log("touchDragged: ", String.format("(%s, %s), %s", x, y, typeID));
+				board.touchUp(0, 0);
 			}
 
 			@Override
@@ -66,8 +66,8 @@ public class AnimalActor extends Image {
 		addListener(inputListener);
 	}
 
-	public String getType() {
-        return type;
+	public int getTypeID() {
+        return typeID;
     }
 
 	@Override
@@ -77,6 +77,7 @@ public class AnimalActor extends Image {
 	}
 
 	public void draw(Batch batch){
+		Texture texture = Assets.animalTextures.get(typeID);
         float x = row*texture.getWidth();
 		float y = col*texture.getHeight();
 		setX(x);
@@ -86,7 +87,6 @@ public class AnimalActor extends Image {
 		setWidth(texture.getWidth());
 		setHeight(texture.getHeight());
 		setBounds(x, y, texture.getWidth(), texture.getHeight());
-		prepareListener();
 	}
 
     @Override
@@ -94,6 +94,10 @@ public class AnimalActor extends Image {
         if (!(o instanceof AnimalActor))
             return false;
         AnimalActor that = (AnimalActor)o;
-        return this.getType().equals(that.getType());
+        return this.getTypeID() == that.getTypeID();
     }
+
+	public void setTypeID(int typeID) {
+		this.typeID = typeID;
+	}
 }
