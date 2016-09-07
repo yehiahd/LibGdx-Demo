@@ -48,7 +48,7 @@ public class BoardActor extends Image {
 
         renderer.setColor(new Color(1,1,1,0.3f));
 
-        setOrigin((Gdx.graphics.getWidth() - W)/2.0f, (Gdx.graphics.getHeight() - H) /2.0f);
+//        setOrigin((Gdx.graphics.getWidth() - W)/2.0f, (Gdx.graphics.getHeight() - H) /2.0f);
         renderer.rect(getOriginX(), getOriginY(), W,H);
 
         renderer.end();
@@ -67,17 +67,17 @@ public class BoardActor extends Image {
 	}
 
 	public void touchUp(int row, int col) {
+		if (outOfBoundary(row, col)) return;
+
 		AnimalActor otherAnimal = animalActors[row][col];
 		if (selectedAnimal != null && selectedAnimal != otherAnimal){
-			float tmpX = selectedAnimal.getX();
-			float tmpY = selectedAnimal.getY();
-//			float tmpOX = selectedAnimal.getOriginX();
-//			float tmpOY = selectedAnimal.getOriginY();
-			selectedAnimal.setX(otherAnimal.getX());			selectedAnimal.setY(otherAnimal.getY());
-//			selectedAnimal.setOrigin(otherAnimal.getOriginX(), otherAnimal.getOriginY());
-			otherAnimal.setX(tmpX);
-			otherAnimal.setY(tmpY);
-//			otherAnimal.setOrigin(tmpOX, tmpOY);
+			int tmpType = selectedAnimal.getTypeID();
+			selectedAnimal.setTypeID(otherAnimal.getTypeID());
+			otherAnimal.setTypeID(tmpType);
 		}
+	}
+
+	private boolean outOfBoundary(int row, int col) {
+		return row >= rows || col >= cols || row < 0 || col < 0;
 	}
 }
