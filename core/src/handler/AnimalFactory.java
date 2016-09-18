@@ -8,9 +8,13 @@ import model.AnimalTypes;
  * Created by yehia on 05/09/16.
  */
 public class AnimalFactory {
-    public static AnimalActor getRandomizedAnimal(int row, int col, BoardActor board){
-        int index = (int)(Math.random() * (AnimalTypes.COUNT-1));
+    public static AnimalActor getRandomizedAnimal(BoardActor board){
+        int index = getRandomIndex();
 //        String animalType = AnimalTypes.TYPES[index];
-        return new AnimalActor(board, row, col, index);
+        return new AnimalActor(board, index);
     }
+
+	public static int getRandomIndex() {
+		return (int)(Math.random() * (AnimalTypes.COUNT-1));
+	}
 }

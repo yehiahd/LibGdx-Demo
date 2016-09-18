@@ -5,7 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import actor.BoardActor;
 import handler.Assets;
@@ -16,6 +16,7 @@ public class PiratesPigger extends ApplicationAdapter {
 	private SpriteBatch batch;
 	private BoardActor board;
 	private Stage stage;
+	private Table table;
 
 
 	@Override
@@ -23,25 +24,37 @@ public class PiratesPigger extends ApplicationAdapter {
 		Assets.load();
 
 		batch = new SpriteBatch();
-		stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-		Gdx.input.setInputProcessor(stage);
+		stage = new Stage();
+		table = new Table();
+//		stage = new Stage(new FillViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 
-		board = new BoardActor(10,10);
-		board.initialize(stage);
+		board = new BoardActor(8,8);
+		board.initialize(table);
+		initTable();
+		stage.addActor(table);
+		Gdx.input.setInputProcessor(stage);
+	}
+
+	private void initTable() {
+		table.debug();
+		table.setFillParent(false);
+		table.setPosition(Gdx.graphics.getWidth()/2 - table.getWidth()/2, Gdx.graphics.getHeight()/2 - table.getHeight()/2);
 	}
 
 	@Override
 	public void render () {
-		Gdx.gl.glClearColor( 1, 0, 0, 1 );
-		Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT );
+		Gdx.gl.glClearColor(0f, 0f, 0f, 0.2f);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		int width = Gdx.graphics.getWidth();
 		int height = Gdx.graphics.getHeight();
 
 		batch.begin();
 		Drawer.draw(batch, width, height);
 		batch.end();
-//		stage.clear();
-		board.drawBoard();
+
+//		board.checkForMatches();
+//		board.drawBoard(table.getX(), table.getY());
+		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
 	}
 	
