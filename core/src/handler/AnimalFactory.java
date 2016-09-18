@@ -1,15 +1,20 @@
 package handler;
 
 import actor.AnimalActor;
+import actor.BoardActor;
 import model.AnimalTypes;
 
 /**
  * Created by yehia on 05/09/16.
  */
 public class AnimalFactory {
-    public static AnimalActor getRandomizedAnimal(int row, int col){
-        int index = (int)(Math.random() * (AnimalTypes.COUNT-1));
-        String animalType = AnimalTypes.TYPES[index];
-        return new AnimalActor(row, col, animalType, Assets.animalTextures.get(index));
+    public static AnimalActor getRandomizedAnimal(BoardActor board){
+        int index = getRandomIndex();
+//        String animalType = AnimalTypes.TYPES[index];
+        return new AnimalActor(board, index);
     }
+
+	public static int getRandomIndex() {
+		return (int)(Math.random() * (AnimalTypes.COUNT-1));
+	}
 }

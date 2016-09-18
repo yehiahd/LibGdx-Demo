@@ -2,47 +2,66 @@ package com.ya.piratespigger;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
-import actor.AnimalActor;
 import actor.BoardActor;
 import handler.Assets;
-import model.AnimalTypes;
+import handler.Drawer;
 
 public class PiratesPigger extends ApplicationAdapter {
 
-	SpriteBatch batch;
-	BoardActor boardActor;
-    Stage stage;
+	private SpriteBatch batch;
+	private BoardActor board;
+	private Stage stage;
+	private Table table;
+
+
 	@Override
 	public void create () {
 		Assets.load();
-//		batch = new SpriteBatch();
-		int width = Gdx.graphics.getWidth();
-		int height = Gdx.graphics.getHeight();
-        stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(),Gdx.graphics.getHeight()));
-        Gdx.input.setInputProcessor(stage);
-        AnimalActor actor = new AnimalActor(0,0, AnimalTypes.TYPES[0],Assets.panda);
-        actor.setTouchable(Touchable.enabled);
-        stage.addActor(actor);
 
-//		boardActor = new BoardActor(10,10);
-//		boardActor.initialize(batch);
+		batch = new SpriteBatch();
+		stage = new Stage();
+		table = new Table();
+//		stage = new Stage(new FillViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+
+		board = new BoardActor(8,8);
+		board.initialize(table);
+		initTable();
+		stage.addActor(table);
+		Gdx.input.setInputProcessor(stage);
+	}
+
+	private void initTable() {
+		table.debug();
+		table.setFillParent(false);
+		table.setPosition(Gdx.graphics.getWidth()/2 - table.getWidth()/2, Gdx.graphics.getHeight()/2 - table.getHeight()/2);
 	}
 
 	@Override
 	public void render () {
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
+		Gdx.gl.glClearColor(0f, 0f, 0f, 0.2f);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		int width = Gdx.graphics.getWidth();
+		int height = Gdx.graphics.getHeight();
+
+		batch.begin();
+		Drawer.draw(batch, width, height);
+		batch.end();
+
+//		board.checkForMatches();
+//		board.drawBoard(table.getX(), table.getY());
+		stage.act(Gdx.graphics.getDeltaTime());
+		stage.draw();
 	}
 	
 	@Override
 	public void dispose () {
-		//batch.dispose();
-        stage.dispose();
+		batch.dispose();
+		stage.dispose();
 	}
 
 }
