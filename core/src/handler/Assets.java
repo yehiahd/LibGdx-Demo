@@ -20,7 +20,6 @@ public class Assets {
     public static Sound sound;
     public static List<Texture> animalTextures;
     public static List<Sprite> animalSprites;
-    Twee
 
     public static void load(){
         loadImages();
