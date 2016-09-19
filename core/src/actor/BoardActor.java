@@ -22,14 +22,14 @@ public class BoardActor extends Actor implements ActorEventListener {
 	private Table table;
 	private boolean animating;
 
-	public BoardActor(int rows, int cols) {
+	public BoardActor(int rows, int cols, Table table) {
         this.rows = rows;
         this.cols = cols;
-    }
+		this.table = table;
+		initialize();
+	}
 
-    public void initialize(Table table) {
-	    this.table = table;
-
+    public void initialize() {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
 	            AnimalActor actor = AnimalFactory.getRandomizedAnimal(this);
@@ -91,7 +91,8 @@ public class BoardActor extends Actor implements ActorEventListener {
 	 * @param clearAfter if you want the list to be cleared after you're done checking.
 	 * @return whether the whole grid contains a match or not.
 	 */
-	private boolean checkMatches(boolean clearAfter) {
+	@Override
+	public boolean checkMatches(boolean clearAfter) {
 		boolean result;
 		for (int i = 0; i < rows; i++)
 			for (int j = 0; j < cols; j++)
@@ -173,45 +174,18 @@ public class BoardActor extends Actor implements ActorEventListener {
 		return actor;
 	}
 
-	private void swapActors(final AnimalActor selectedAnimal, final AnimalActor otherAnimal, final boolean fromUser) {
-		final int tmpType = selectedAnimal.getTypeID();
-
-		animating = true;
-		selectedAnimal.addAction(
-				Actions.sequence(
-						Actions.alpha(0, 0.5f),
-						Actions.run(new Runnable() {
-							@Override
-							public void run() {
-								selectedAnimal.replaceWith(otherAnimal.getTypeID());
-								otherAnimal.replaceWith(tmpType);
-							}
-						}),
-						Actions.alpha(1, 0.5f),
-						Actions.run(new Runnable() {
-							@Override
-							public void run() {
-								if (fromUser && !checkMatches(true)) //if an actual user swap and there are no matches, swap them back.
-									swapActors(otherAnimal, selectedAnimal, !fromUser);
-								else // we're done here.
-									animating = false;
-							}
-						})
-				)
-		);
-		otherAnimal.addAction(
-				Actions.sequence(
-						Actions.alpha(0, 0.5f),
-						Actions.alpha(1, 0.5f)
-				)
-		);
+	@Override
+	public void clearAnimation() {
+		animating = false;
 	}
 
 	@Override
 	public void onActorClicked(AnimalActor actor) {
 		if (this.selectedActor != null){
-			if (actor.canSwap(this.selectedActor))
-				swapActors(actor, this.selectedActor, true);
+			if (actor.canSwap(this.selectedActor)) {
+				animating = true;
+				actor.swapWith(this.selectedActor, true);
+			}
 			BoardActor.this.selectedActor = null;
 		}
 		else

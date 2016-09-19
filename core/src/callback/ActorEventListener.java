@@ -7,4 +7,8 @@ import actor.AnimalActor;
  */
 public interface ActorEventListener {
 	void onActorClicked(AnimalActor actor);
+
+	void clearAnimation();
+
+	boolean checkMatches(boolean clearAfter);
 }

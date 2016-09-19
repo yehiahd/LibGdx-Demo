@@ -29,10 +29,8 @@ public class PiratesPigger extends ApplicationAdapter {
 		stage = new Stage();
 		table = new Table();
 
-		board = new BoardActor(8 ,8);
-		board.initialize(table);
+		board = new BoardActor(8 ,8, table);
 		initTable();
-		stage.addActor(table);
 		Gdx.input.setInputProcessor(stage);
 	}
 
@@ -40,6 +38,7 @@ public class PiratesPigger extends ApplicationAdapter {
 		table.debug();
 		table.setFillParent(false);
 		table.setPosition(Gdx.graphics.getWidth()/2 - table.getWidth()/2, Gdx.graphics.getHeight()/2 - table.getHeight()/2);
+		stage.addActor(table);
 	}
 
 	@Override
