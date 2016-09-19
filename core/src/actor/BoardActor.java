@@ -1,12 +1,13 @@
 package actor;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import java.util.HashSet;
+import java.util.Iterator;
 
 import handler.AnimalFactory;
 import handler.Assets;
@@ -21,6 +22,7 @@ public class BoardActor extends Actor {
 	private final int W;
 	private AnimalActor selectedActor;
 	private Table table;
+	private boolean animating;
 
 	public BoardActor(int rows, int cols) {
         this.rows = rows;
@@ -35,6 +37,7 @@ public class BoardActor extends Actor {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
 	            AnimalActor actor = AnimalFactory.getRandomizedAnimal(this);
+	            actor.setTable(table);
 	            table.add(actor);
             }
 	        table.row();
@@ -75,19 +78,39 @@ public class BoardActor extends Actor {
 //		Gdx.app.log("checking: ", toBeRemoved.size()+"");
 //		for (Vector2 vector: toBeRemoved)
 //			Gdx.app.log("print: ", vector.x + " " + vector.y);
-
-		for (Actor actor: toBeRemoved){
-//			actor.addAction(new SequenceAction(Actions.fadeOut(1f)));
-			actor.addAction(new SequenceAction(Actions.scaleTo(0,0,1), Actions.visible(false)));
+		if (!toBeRemoved.isEmpty()) {
+			Gdx.app.log("Removing: ", toBeRemoved.size()+" actors.");
+			animating = true;
 		}
 
+		for (final Iterator<Actor> iterator = toBeRemoved.iterator(); iterator.hasNext(); ) {
+			Actor actor = iterator.next();
+//			actor.addAction(new SequenceAction(Actions.fadeOut(1f)));
+			final AnimalActor animalActor = (AnimalActor) actor;
+			animalActor.replaceWithRandom();
+			actor.addAction(Actions.sequence(
+					Actions.scaleBy(-0.5f, -0.5f, 1),
+					new Action() {
+						@Override
+						public boolean act(float delta) {
+							animalActor.refreshTexture();
+							return true;
+						}
+					},
+					Actions.scaleBy(0.5f, 0.5f, 1),
+					new Action() {
+						@Override
+						public boolean act(float delta) {
+							if (!iterator.hasNext())
+								animating = false;
+							return true;
+						}
+					}
+			));
+		}
+		if (!toBeRemoved.isEmpty())
+			Gdx.app.log("Done!", "");
 		toBeRemoved.clear();
-	}
-
-	private void replace(Actor actor) {
-		AnimalActor animalActor = (AnimalActor) actor;
-		animalActor.replaceWithRandom();
-//		animalActor.draw(table.getStage().getBatch(), 0.18f);
 	}
 
 	private void checkForMatches(int row, int col) {
@@ -146,7 +169,10 @@ public class BoardActor extends Actor {
 	}
 
 	private AnimalActor getActorAt(int row, int col) {
-		return (AnimalActor) table.getChildren().get(rows*row+col);
+		AnimalActor actor = (AnimalActor) table.getCells().get(rows * row + col).getActor();
+		if (row != table.getCell(actor).getRow() || col != table.getCell(actor).getColumn())
+		Gdx.app.log("CONFLICT!", actor.toString());
+		return actor;
 	}
 
 //	public void touchUp(AnimalActor selectedAnimal, int row, int col) {
@@ -159,14 +185,27 @@ public class BoardActor extends Actor {
 //	}
 
 	private void swapActors(final AnimalActor selectedAnimal, final AnimalActor otherAnimal) {
-		selectedAnimal.addAction(new SequenceAction(Actions.moveTo(otherAnimal.getX(),otherAnimal.getY(), 0.5f), new RunnableAction(){
-			@Override
-			public void run() {
-				table.swapActor(selectedAnimal, otherAnimal);
-				checkForMatches();
-			}
-		}));
-		otherAnimal.addAction(new SequenceAction(Actions.moveTo(selectedAnimal.getX(),selectedAnimal.getY(), 0.5f)));
+		table.swapActor(otherAnimal, selectedAnimal);
+		int tmpType = selectedAnimal.getTypeID();
+		selectedAnimal.replaceWith(otherAnimal.getTypeID());
+		otherAnimal.replaceWith(tmpType);
+//		checkForMatches();
+//		float tmpX = selectedAnimal.getX();
+//		float tmpY = selectedAnimal.getY();
+//		selectedAnimal.addAction(
+//				Actions.sequence(
+//						Actions.moveTo(otherAnimal.getX(), otherAnimal.getY(), 0.5f),
+//						Actions.run(new Runnable() {
+//							@Override
+//							public void run() {
+//								int tmpType = selectedAnimal.getTypeID();
+//								selectedAnimal.replaceWith(otherAnimal.getTypeID());
+//								otherAnimal.replaceWith(tmpType);
+//								table.swapActor(otherAnimal, selectedAnimal);
+//							}
+//						})
+//				));
+//		otherAnimal.addAction(Actions.sequence(Actions.moveTo(tmpX, tmpY, 0.5f)));
 	}
 
 	private boolean outOfBoundary(int row, int col) {
@@ -174,8 +213,9 @@ public class BoardActor extends Actor {
 	}
 
 	public void setSelectedActor(AnimalActor otherActor) {
-		if (this.selectedActor != null && canSwap(otherActor, this.selectedActor)) {
-			swapActors(otherActor, this.selectedActor);
+		if (this.selectedActor != null){
+			if (canSwap(otherActor, this.selectedActor))
+				swapActors(otherActor, this.selectedActor);
 			BoardActor.this.selectedActor = null;
 		}
 		else
@@ -190,5 +230,9 @@ public class BoardActor extends Actor {
 			return false;
 
 		return true;
+	}
+
+	public boolean isAnimating() {
+		return animating;
 	}
 }

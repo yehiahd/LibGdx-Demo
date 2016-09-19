@@ -7,9 +7,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import handler.AnimalFactory;
 import handler.Assets;
+import model.AnimalTypes;
 
 /**
  * Created by yehia on 05/09/16.
@@ -20,6 +22,7 @@ public class AnimalActor extends Actor {
 	private BoardActor board;
 
     private int typeID;
+	private Table table;
 
 	public AnimalActor(BoardActor board, int typeID){
 	    this.board = board;
@@ -35,7 +38,7 @@ public class AnimalActor extends Actor {
 		InputListener inputListener = new InputListener() {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				Gdx.app.log("touchDown: ", String.format("(%s, %s), type: %s", x, y, typeID));
+				Gdx.app.log("touchDown: ", AnimalActor.this.toString());
 //				lastTouch.set(x,y);
 				board.setSelectedActor(AnimalActor.this);
 				return true;
@@ -43,7 +46,7 @@ public class AnimalActor extends Actor {
 
 			@Override
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-				Gdx.app.log("touchUp: ", String.format("(%s, %s)", x, y));
+//				Gdx.app.log("touchUp: ", String.format("(%s, %s)", x, y));
 				/*int change = -1; // signal no change
 
 				if (Math.abs(x - lastTouch.x) <= AnimalActor.this.getWidth()) { // no outside change in x
@@ -130,8 +133,36 @@ public class AnimalActor extends Actor {
 	}
 
 	public void replaceWithRandom() {
-		int index = AnimalFactory.getRandomIndex();
-		this.typeID = index;
-		this.textureRegion = new TextureRegion(Assets.getTexture(index));
+		Gdx.app.log("Before replace: ", this.toString());
+		setTypeID(AnimalFactory.getRandomIndex());
+//		refreshTexture();
+//		Gdx.app.log("After replace: ", this.toString());
+	}
+
+	public void replaceWith(int typeID) {
+		setTypeID(typeID);
+		refreshTexture();
+	}
+
+	public void refreshTexture() {
+		this.textureRegion = new TextureRegion(Assets.getTexture(this.typeID));
+	}
+
+	public void setTable(Table table) {
+		this.table = table;
+	}
+
+	@Override
+	public String toString() {
+		return String.format(
+				"AnimalType: %s\n" +
+				"row, col => (%s, %s)\n" +
+				"x, y => (%s, %s)\n",
+				AnimalTypes.TYPES[typeID],
+				table.getCell(this).getRow(),
+				table.getCell(this).getColumn(),
+				getX(),
+				getY()
+				);
 	}
 }
