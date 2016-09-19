@@ -28,7 +28,7 @@ public class PiratesPigger extends ApplicationAdapter {
 		table = new Table();
 //		stage = new Stage(new FillViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 
-		board = new BoardActor(4,4);
+		board = new BoardActor(8 ,8);
 		board.initialize(table);
 		initTable();
 		stage.addActor(table);
@@ -36,7 +36,7 @@ public class PiratesPigger extends ApplicationAdapter {
 //		Timer.schedule(new Timer.Task() {
 //			@Override
 //			public void run() {
-//				board.checkForMatches();
+//				board.removeMatches();
 //			}
 //		}, 3);
 	}
@@ -59,7 +59,7 @@ public class PiratesPigger extends ApplicationAdapter {
 		batch.end();
 
 		if (!board.isAnimating())
-			board.checkForMatches();
+			board.removeMatches();
 //		board.drawBoard(table.getX(), table.getY());
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();

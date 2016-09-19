@@ -42,42 +42,21 @@ public class BoardActor extends Actor {
             }
 	        table.row();
         }
-//	    checkForMatches();
     }
 
-//	public void drawBoard(float x, float y) {
-//        Gdx.gl.glEnable(GL20.GL_BLEND);
-//        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-//        ShapeRenderer renderer = new ShapeRenderer();
-//        renderer.begin(ShapeRenderer.ShapeType.Filled);
-//
-//        renderer.setColor(new Color(1,1,1,0.3f));
-//
-////        setOrigin((Gdx.graphics.getWidth() - W)/2.0f, (Gdx.graphics.getHeight() - H) /2.0f);
-//        renderer.rect(x, y, W,H);
-//
-//        renderer.end();
-//        Gdx.gl.glDisable(GL20.GL_BLEND);
-//
-////		for (int i = 0; i < rows; i++) {
-////			for (int j = 0; j < cols; j++) {
-//////				animalActors[i][j].setOrigin(getOriginX(), getOriginY());
-////				stage.addActor(animalActors[i][j]);
-////			}
-////		}
-//    }
-
+	/**
+	 * the list which stores the actors to be removed by removeMatches().
+	 */
 	HashSet<Actor> toBeRemoved;
 
-	public void checkForMatches(){
+	/**
+	 * replaces with animation the matched actors.
+	 */
+	public void removeMatches(){
 		toBeRemoved = new HashSet<Actor>();
-		for (int i = 0; i < rows; i++)
-			for (int j = 0; j < cols; j++)
-				checkForMatches(i, j);
 
-//		Gdx.app.log("checking: ", toBeRemoved.size()+"");
-//		for (Vector2 vector: toBeRemoved)
-//			Gdx.app.log("print: ", vector.x + " " + vector.y);
+		checkMatches(false);
+
 		if (!toBeRemoved.isEmpty()) {
 			Gdx.app.log("Removing: ", toBeRemoved.size()+" actors.");
 			animating = true;
@@ -85,7 +64,6 @@ public class BoardActor extends Actor {
 
 		for (final Iterator<Actor> iterator = toBeRemoved.iterator(); iterator.hasNext(); ) {
 			Actor actor = iterator.next();
-//			actor.addAction(new SequenceAction(Actions.fadeOut(1f)));
 			final AnimalActor animalActor = (AnimalActor) actor;
 			animalActor.replaceWithRandom();
 			actor.addAction(Actions.sequence(
@@ -113,9 +91,33 @@ public class BoardActor extends Actor {
 		toBeRemoved.clear();
 	}
 
-	private void checkForMatches(int row, int col) {
+	/**
+	 *
+	 * @param clearAfter if you want the list to be cleared after you're done checking.
+	 * @return whether the whole grid contains a match or not.
+	 */
+	private boolean checkMatches(boolean clearAfter) {
+		boolean result;
+		for (int i = 0; i < rows; i++)
+			for (int j = 0; j < cols; j++)
+				checkMatches(i, j);
+
+		result = toBeRemoved.size() > 0;
+
+		if (clearAfter) {
+			toBeRemoved.clear();
+		}
+		return result;
+	}
+
+	/**
+	 * @param row
+	 * @param col
+	 * @return return whether a match exists for this cell or not.
+	 */
+	private boolean checkMatches(int row, int col) {
 		if (outOfBoundary(row, col))
-			return;
+			return false;
 
 		AnimalActor current = getActorAt(row, col);
 		if (row > 1)
@@ -166,46 +168,48 @@ public class BoardActor extends Actor {
 				toBeRemoved.add(getActorAt(row, col + 2));
 			}
 
+		return !toBeRemoved.isEmpty();
 	}
 
 	private AnimalActor getActorAt(int row, int col) {
-		AnimalActor actor = (AnimalActor) table.getCells().get(rows * row + col).getActor();
+		AnimalActor actor = (AnimalActor) table.getCells().get(table.getRows() * row + col).getActor();
 		if (row != table.getCell(actor).getRow() || col != table.getCell(actor).getColumn())
-		Gdx.app.log("CONFLICT!", actor.toString());
+			Gdx.app.log("CONFLICT!", actor.toString());
 		return actor;
 	}
 
-//	public void touchUp(AnimalActor selectedAnimal, int row, int col) {
-//		if (outOfBoundary(row, col)) return;
-//
-//		AnimalActor otherAnimal = animalActors[row][col];
-//		if (selectedAnimal != null && selectedAnimal != otherAnimal){
-////			swapActors(selectedAnimal, otherAnimal);
-//		}
-//	}
+	private void swapActors(final AnimalActor selectedAnimal, final AnimalActor otherAnimal, final boolean fromUser) {
+		final int tmpType = selectedAnimal.getTypeID();
 
-	private void swapActors(final AnimalActor selectedAnimal, final AnimalActor otherAnimal) {
-		table.swapActor(otherAnimal, selectedAnimal);
-		int tmpType = selectedAnimal.getTypeID();
-		selectedAnimal.replaceWith(otherAnimal.getTypeID());
-		otherAnimal.replaceWith(tmpType);
-//		checkForMatches();
-//		float tmpX = selectedAnimal.getX();
-//		float tmpY = selectedAnimal.getY();
-//		selectedAnimal.addAction(
-//				Actions.sequence(
-//						Actions.moveTo(otherAnimal.getX(), otherAnimal.getY(), 0.5f),
-//						Actions.run(new Runnable() {
-//							@Override
-//							public void run() {
-//								int tmpType = selectedAnimal.getTypeID();
-//								selectedAnimal.replaceWith(otherAnimal.getTypeID());
-//								otherAnimal.replaceWith(tmpType);
-//								table.swapActor(otherAnimal, selectedAnimal);
-//							}
-//						})
-//				));
-//		otherAnimal.addAction(Actions.sequence(Actions.moveTo(tmpX, tmpY, 0.5f)));
+		animating = true;
+		selectedAnimal.addAction(
+				Actions.sequence(
+						Actions.alpha(0, 0.5f),
+						Actions.run(new Runnable() {
+							@Override
+							public void run() {
+								selectedAnimal.replaceWith(otherAnimal.getTypeID());
+								otherAnimal.replaceWith(tmpType);
+							}
+						}),
+						Actions.alpha(1, 0.5f),
+						Actions.run(new Runnable() {
+							@Override
+							public void run() {
+								if (fromUser && !checkMatches(true)) //if an actual user swap and there are no matches, swap them back.
+									swapActors(otherAnimal, selectedAnimal, !fromUser);
+								else // we're done here.
+									animating = false;
+							}
+						})
+				)
+		);
+		otherAnimal.addAction(
+				Actions.sequence(
+						Actions.alpha(0, 0.5f),
+						Actions.alpha(1, 0.5f)
+				)
+		);
 	}
 
 	private boolean outOfBoundary(int row, int col) {
@@ -215,7 +219,7 @@ public class BoardActor extends Actor {
 	public void setSelectedActor(AnimalActor otherActor) {
 		if (this.selectedActor != null){
 			if (canSwap(otherActor, this.selectedActor))
-				swapActors(otherActor, this.selectedActor);
+				swapActors(otherActor, this.selectedActor, true);
 			BoardActor.this.selectedActor = null;
 		}
 		else
