@@ -28,9 +28,8 @@ public class AnimalActor extends Actor {
 	public AnimalActor(BoardActor board, int typeID){
 	    this.board = board;
         this.typeID = typeID;
-		textureRegion = new TextureRegion(Assets.animalTextures.get(typeID));
+		textureRegion = new TextureRegion(Assets.getInstance().getTextureAt(typeID));
 		setBounds(getX(), getY(), textureRegion.getRegionWidth(), textureRegion.getRegionHeight());
-
 		setTouchable(Touchable.enabled);
 	    prepareListener();
     }
@@ -40,7 +39,6 @@ public class AnimalActor extends Actor {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				Gdx.app.log("touchDown: ", AnimalActor.this.toString());
-//				lastTouch.set(x,y);
 				board.setSelectedActor(AnimalActor.this);
 				return true;
 			}
@@ -97,11 +95,6 @@ public class AnimalActor extends Actor {
 					}
 				}*/
 			}
-
-			@Override
-			public void touchDragged(InputEvent event, float x, float y, int pointer) {
-//				Gdx.app.log("touchDragged: ", String.format("(%s, %s), pointer: %s", x, y, pointer));
-			}
 		};
 		addListener(inputListener);
 	}
@@ -134,9 +127,8 @@ public class AnimalActor extends Actor {
 
 	public void replaceWithRandom() {
 		Gdx.app.log("Before replace: ", this.toString());
-		setTypeID(AnimalFactory.getRandomIndex());
-//		refreshTexture();
-//		Gdx.app.log("After replace: ", this.toString());
+		replaceWith(AnimalFactory.getRandomIndex());
+		Gdx.app.log("After replace: ", this.toString());
 	}
 
 	public void replaceWith(int typeID) {
@@ -145,7 +137,7 @@ public class AnimalActor extends Actor {
 	}
 
 	public void refreshTexture() {
-		this.textureRegion = new TextureRegion(Assets.getTexture(this.typeID));
+		this.textureRegion = new TextureRegion(Assets.getInstance().getTextureAt(this.typeID));
 	}
 
 	public void setTable(Table table) {

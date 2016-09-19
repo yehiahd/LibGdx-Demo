@@ -10,7 +10,6 @@ import model.AnimalTypes;
 public class AnimalFactory {
     public static AnimalActor getRandomizedAnimal(BoardActor board){
         int index = getRandomIndex();
-//        String animalType = AnimalTypes.TYPES[index];
         return new AnimalActor(board, index);
     }
 

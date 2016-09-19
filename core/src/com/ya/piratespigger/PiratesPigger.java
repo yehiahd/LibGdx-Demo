@@ -17,28 +17,23 @@ public class PiratesPigger extends ApplicationAdapter {
 	private BoardActor board;
 	private Stage stage;
 	private Table table;
+	private Assets assets;
 
 
 	@Override
 	public void create () {
-		Assets.load();
+		assets = Assets.getInstance();
+		assets.load();
 
 		batch = new SpriteBatch();
 		stage = new Stage();
 		table = new Table();
-//		stage = new Stage(new FillViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 
 		board = new BoardActor(8 ,8);
 		board.initialize(table);
 		initTable();
 		stage.addActor(table);
 		Gdx.input.setInputProcessor(stage);
-//		Timer.schedule(new Timer.Task() {
-//			@Override
-//			public void run() {
-//				board.removeMatches();
-//			}
-//		}, 3);
 	}
 
 	private void initTable() {
@@ -60,7 +55,7 @@ public class PiratesPigger extends ApplicationAdapter {
 
 		if (!board.isAnimating())
 			board.removeMatches();
-//		board.drawBoard(table.getX(), table.getY());
+
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
 	}
@@ -69,6 +64,7 @@ public class PiratesPigger extends ApplicationAdapter {
 	public void dispose () {
 		batch.dispose();
 		stage.dispose();
+		assets.dispose();
 	}
 
 }

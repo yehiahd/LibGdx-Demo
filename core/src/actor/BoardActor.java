@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import handler.AnimalFactory;
-import handler.Assets;
 
 /**
  * Created by yehia on 05/09/16.
@@ -18,8 +17,6 @@ import handler.Assets;
 public class BoardActor extends Actor {
     private final int rows;
     private final int cols;
-	private final int H;
-	private final int W;
 	private AnimalActor selectedActor;
 	private Table table;
 	private boolean animating;
@@ -27,8 +24,6 @@ public class BoardActor extends Actor {
 	public BoardActor(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
-	    this.W = rows * Assets.panda.getWidth();
-	    this.H = cols * Assets.panda.getHeight();
     }
 
     public void initialize(Table table) {
@@ -65,13 +60,12 @@ public class BoardActor extends Actor {
 		for (final Iterator<Actor> iterator = toBeRemoved.iterator(); iterator.hasNext(); ) {
 			Actor actor = iterator.next();
 			final AnimalActor animalActor = (AnimalActor) actor;
-			animalActor.replaceWithRandom();
 			actor.addAction(Actions.sequence(
 					Actions.scaleBy(-0.5f, -0.5f, 1),
 					new Action() {
 						@Override
 						public boolean act(float delta) {
-							animalActor.refreshTexture();
+							animalActor.replaceWithRandom();
 							return true;
 						}
 					},
