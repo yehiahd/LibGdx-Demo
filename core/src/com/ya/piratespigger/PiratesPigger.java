@@ -23,6 +23,7 @@ public class PiratesPigger extends ApplicationAdapter {
 	public void create () {
 		Assets.load();
 
+
 		batch = new SpriteBatch();
 		stage = new Stage();
 		table = new Table();
@@ -57,7 +58,7 @@ public class PiratesPigger extends ApplicationAdapter {
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
 	}
-	
+
 	@Override
 	public void dispose () {
 		batch.dispose();
