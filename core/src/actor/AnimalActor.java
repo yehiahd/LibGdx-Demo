@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
+import callback.ActorEventListener;
 import handler.AnimalFactory;
 import handler.Assets;
 import model.AnimalTypes;
@@ -20,13 +21,12 @@ import model.AnimalTypes;
 public class AnimalActor extends Actor {
 
 	private TextureRegion textureRegion;
-	private BoardActor board;
-
     private int typeID;
 	private Table table;
+	private ActorEventListener listener;
 
-	public AnimalActor(BoardActor board, int typeID){
-	    this.board = board;
+	public AnimalActor(ActorEventListener listener, int typeID){
+		this.listener = listener;
         this.typeID = typeID;
 		textureRegion = new TextureRegion(Assets.getInstance().getTextureAt(typeID));
 		setBounds(getX(), getY(), textureRegion.getRegionWidth(), textureRegion.getRegionHeight());
@@ -39,7 +39,7 @@ public class AnimalActor extends Actor {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				Gdx.app.log("touchDown: ", AnimalActor.this.toString());
-				board.setSelectedActor(AnimalActor.this);
+				listener.onActorClicked(AnimalActor.this);
 				return true;
 			}
 
@@ -138,6 +138,16 @@ public class AnimalActor extends Actor {
 
 	public void refreshTexture() {
 		this.textureRegion = new TextureRegion(Assets.getInstance().getTextureAt(this.typeID));
+	}
+
+	public boolean canSwap(AnimalActor that) {
+		if (this.getX() != that.getX() && this.getY() != that.getY())
+			return false;
+
+		if (Math.abs(this.getX() - that.getX()) != this.getWidth() && Math.abs(this.getY() - that.getY()) != this.getHeight())
+			return false;
+
+		return true;
 	}
 
 	public void setTable(Table table) {

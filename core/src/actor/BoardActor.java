@@ -9,12 +9,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import callback.ActorEventListener;
 import handler.AnimalFactory;
 
 /**
  * Created by yehia on 05/09/16.
  */
-public class BoardActor extends Actor {
+public class BoardActor extends Actor implements ActorEventListener {
     private final int rows;
     private final int cols;
 	private AnimalActor selectedActor;
@@ -206,28 +207,19 @@ public class BoardActor extends Actor {
 		);
 	}
 
-	private boolean outOfBoundary(int row, int col) {
-		return row >= rows || col >= cols || row < 0 || col < 0;
-	}
-
-	public void setSelectedActor(AnimalActor otherActor) {
+	@Override
+	public void onActorClicked(AnimalActor actor) {
 		if (this.selectedActor != null){
-			if (canSwap(otherActor, this.selectedActor))
-				swapActors(otherActor, this.selectedActor, true);
+			if (actor.canSwap(this.selectedActor))
+				swapActors(actor, this.selectedActor, true);
 			BoardActor.this.selectedActor = null;
 		}
 		else
-			this.selectedActor = otherActor;
+			this.selectedActor = actor;
 	}
 
-	private boolean canSwap(AnimalActor first, AnimalActor second) {
-		if (first.getX() != second.getX() && first.getY() != second.getY())
-			return false;
-
-		if (Math.abs(first.getX() - second.getX()) != first.getWidth() && Math.abs(first.getY() - second.getY()) != first.getHeight())
-			return false;
-
-		return true;
+	private boolean outOfBoundary(int row, int col) {
+		return row >= rows || col >= cols || row < 0 || col < 0;
 	}
 
 	public boolean isAnimating() {
