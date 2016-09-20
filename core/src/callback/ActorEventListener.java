@@ -10,5 +10,5 @@ public interface ActorEventListener {
 
 	void clearAnimation();
 
-	boolean checkMatches(boolean clearAfter);
+	boolean checkMatches();
 }

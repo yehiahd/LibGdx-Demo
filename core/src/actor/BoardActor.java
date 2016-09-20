@@ -88,10 +88,14 @@ public class BoardActor extends Actor implements ActorEventListener {
 
 	/**
 	 *
-	 * @param clearAfter if you want the list to be cleared after you're done checking.
 	 * @return whether the whole grid contains a match or not.
 	 */
+
 	@Override
+	public boolean checkMatches() {
+		return checkMatches(true);
+	}
+
 	public boolean checkMatches(boolean clearAfter) {
 		boolean result;
 		for (int i = 0; i < rows; i++)

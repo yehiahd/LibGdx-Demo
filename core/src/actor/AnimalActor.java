@@ -143,24 +143,6 @@ public class AnimalActor extends Actor {
 		return true;
 	}
 
-	public void setTable(Table table) {
-		AnimalActor.this.table = table;
-	}
-
-	@Override
-	public String toString() {
-		return String.format(
-				"AnimalType: %s\n" +
-				"row, col => (%s, %s)\n" +
-				"x, y => (%s, %s)\n",
-				AnimalTypes.TYPES[typeID],
-				table.getCell(AnimalActor.this).getRow(),
-				table.getCell(AnimalActor.this).getColumn(),
-				getX(),
-				getY()
-				);
-	}
-
 	public void swapWith(final AnimalActor that, final boolean fromUser) {
 		final int tmpType = AnimalActor.this.getTypeID();
 
@@ -178,7 +160,7 @@ public class AnimalActor extends Actor {
 						Actions.run(new Runnable() {
 							@Override
 							public void run() {
-								if (fromUser && !listener.checkMatches(true)) //if an actual user swap and there are no matches, swap them back.
+								if (fromUser && !listener.checkMatches()) //if an actual user swap and there are no matches, swap them back.
 									that.swapWith(AnimalActor.this, !fromUser);
 								else // we're done here.
 									listener.clearAnimation();
@@ -194,10 +176,28 @@ public class AnimalActor extends Actor {
 		);
 	}
 
+	public void setTable(Table table) {
+		AnimalActor.this.table = table;
+	}
+
 	public int getTableIndex() {
 		int row = table.getCell(AnimalActor.this).getRow();
 		int col = table.getCell(AnimalActor.this).getColumn();
 		return table.getRows() * row + col;
+	}
+
+	@Override
+	public String toString() {
+		return String.format(
+				"AnimalType: %s\n" +
+						"row, col => (%s, %s)\n" +
+						"x, y => (%s, %s)\n",
+				AnimalTypes.TYPES[typeID],
+				table.getCell(AnimalActor.this).getRow(),
+				table.getCell(AnimalActor.this).getColumn(),
+				getX(),
+				getY()
+		);
 	}
 
 	@Override
