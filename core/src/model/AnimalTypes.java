@@ -13,4 +13,11 @@ public class AnimalTypes {
         "bunny",
         "bear"
     };
+
+	public static String getType(int typeID) {
+		if (typeID == -1)
+			return "hidden";
+		else
+			return TYPES[typeID];
+	}
 }

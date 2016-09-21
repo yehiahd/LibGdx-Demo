@@ -64,6 +64,9 @@ public class Assets implements Disposable{
 	}
 
 	public Texture getTextureAt(int index) {
+		if (index < 0 || index >= textures.size())
+			return null;
+
 		return textures.get(index);
 	}
 

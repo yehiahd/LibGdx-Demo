@@ -2,6 +2,7 @@ package actor;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -106,6 +107,17 @@ public class AnimalActor extends Actor {
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
+		if (this.getTypeID() == -1){
+			this.addAction(Actions.alpha(0f, 0));
+			return;
+		}
+
+		AnimalActor predecessor = this.getPredecessor();
+		if (predecessor != null && predecessor.getTypeID() == -1  && !listener.isAnimating()) {
+//			this.swapWith(predecessor, false);
+			this.swapTypeWith(predecessor);
+			return;
+		}
 //		super.draw(batch, parentAlpha);
 		Color color = getColor();
 		batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
@@ -118,10 +130,29 @@ public class AnimalActor extends Actor {
 		AnimalActor.this.typeID = typeID;
 	}
 
+	public void hide() {
+//		replaceWith(-1);
+		setTypeID(-1);
+	}
+
 	public void replaceWithRandom() {
 		Gdx.app.log("Before replace: ", AnimalActor.this.toString());
 		replaceWith(AnimalFactory.getRandomIndex());
+//		this.swapWith(this.getPredecessor(this.getTableIndex()), false);
 		Gdx.app.log("After replace: ", AnimalActor.this.toString());
+	}
+
+	private AnimalActor getPredecessor() {
+		int index = this.getTableIndex();
+		int cols = table.getColumns();
+		int cells = table.getCells().size;
+		AnimalActor predecessor = null;
+
+		if (index + cols < cells) {
+			predecessor = (AnimalActor) table.getCells().get(index + cols).getActor();
+		}
+
+		return predecessor;
 	}
 
 	public void replaceWith(int typeID) {
@@ -130,7 +161,11 @@ public class AnimalActor extends Actor {
 	}
 
 	public void refreshTexture() {
-		AnimalActor.this.textureRegion = new TextureRegion(Assets.getInstance().getTextureAt(AnimalActor.this.typeID));
+		Texture texture = Assets.getInstance().getTextureAt(AnimalActor.this.typeID);
+		if (texture != null) {
+			this.addAction(Actions.alpha(1f, 0));
+			this.textureRegion = new TextureRegion(texture);
+		}
 	}
 
 	public boolean canSwap(AnimalActor that) {
@@ -144,16 +179,17 @@ public class AnimalActor extends Actor {
 	}
 
 	public void swapWith(final AnimalActor that, final boolean fromUser) {
-		final int tmpType = AnimalActor.this.getTypeID();
+		listener.setAnimating();
 
 		AnimalActor.this.addAction(
 				Actions.sequence(
-						Actions.alpha(0, 0.5f),
+						Actions.alpha(0.4f, 0.5f),
 						Actions.run(new Runnable() {
 							@Override
 							public void run() {
-								AnimalActor.this.replaceWith(that.getTypeID());
-								that.replaceWith(tmpType);
+								AnimalActor.this.swapTypeWith(that);
+//								if (!AnimalActor.this.isVisible() || !that.isVisible())
+//									AnimalActor.this.swapVisibility(that);
 							}
 						}),
 						Actions.alpha(1, 0.5f),
@@ -162,8 +198,9 @@ public class AnimalActor extends Actor {
 							public void run() {
 								if (fromUser && !listener.checkMatches()) //if an actual user swap and there are no matches, swap them back.
 									that.swapWith(AnimalActor.this, !fromUser);
-								else // we're done here.
+								else {// we're done here.
 									listener.clearAnimation();
+								}
 							}
 						})
 				)
@@ -176,8 +213,14 @@ public class AnimalActor extends Actor {
 		);
 	}
 
+	private void swapTypeWith(AnimalActor that) {
+		int tmpType = AnimalActor.this.getTypeID();
+		AnimalActor.this.replaceWith(that.getTypeID());
+		that.replaceWith(tmpType);
+	}
+
 	public void setTable(Table table) {
-		AnimalActor.this.table = table;
+		this.table = table;
 	}
 
 	public int getTableIndex() {
@@ -192,7 +235,7 @@ public class AnimalActor extends Actor {
 				"AnimalType: %s\n" +
 						"row, col => (%s, %s)\n" +
 						"x, y => (%s, %s)\n",
-				AnimalTypes.TYPES[typeID],
+				AnimalTypes.getType(typeID),
 				table.getCell(AnimalActor.this).getRow(),
 				table.getCell(AnimalActor.this).getColumn(),
 				getX(),
@@ -205,6 +248,6 @@ public class AnimalActor extends Actor {
 		if (!(o instanceof AnimalActor))
 			return false;
 		AnimalActor that = (AnimalActor)o;
-		return AnimalActor.this.getTypeID() == that.getTypeID();
+		return AnimalActor.this.getTypeID() == that.getTypeID() && that.getTypeID() != -1;
 	}
 }

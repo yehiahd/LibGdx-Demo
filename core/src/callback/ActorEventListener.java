@@ -11,4 +11,8 @@ public interface ActorEventListener {
 	void clearAnimation();
 
 	boolean checkMatches();
+
+	void setAnimating();
+
+	boolean isAnimating();
 }

@@ -61,12 +61,14 @@ public class BoardActor extends Actor implements ActorEventListener {
 		for (final Iterator<Actor> iterator = toBeRemoved.iterator(); iterator.hasNext(); ) {
 			Actor actor = iterator.next();
 			final AnimalActor animalActor = (AnimalActor) actor;
+			// TODO: 9/20/16 put explosive animation logic in a runnable action here to maintain the sequential behaviour.
 			actor.addAction(Actions.sequence(
 					Actions.scaleBy(-0.5f, -0.5f, 1),
 					new Action() {
 						@Override
 						public boolean act(float delta) {
-							animalActor.replaceWithRandom();
+							animalActor.hide();
+//							animalActor.replaceWithRandom();
 							return true;
 						}
 					},
@@ -93,6 +95,7 @@ public class BoardActor extends Actor implements ActorEventListener {
 
 	@Override
 	public boolean checkMatches() {
+		toBeRemoved = new HashSet<Actor>();
 		return checkMatches(true);
 	}
 
@@ -184,6 +187,11 @@ public class BoardActor extends Actor implements ActorEventListener {
 	}
 
 	@Override
+	public void setAnimating() {
+		animating = true;
+	}
+
+	@Override
 	public void onActorClicked(AnimalActor actor) {
 		if (this.selectedActor != null){
 			if (actor.canSwap(this.selectedActor)) {
@@ -200,6 +208,7 @@ public class BoardActor extends Actor implements ActorEventListener {
 		return row >= rows || col >= cols || row < 0 || col < 0;
 	}
 
+	@Override
 	public boolean isAnimating() {
 		return animating;
 	}
