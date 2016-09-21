@@ -16,4 +16,8 @@ public class AnimalFactory {
 	public static int getRandomIndex() {
 		return (int)(Math.random() * (AnimalTypes.COUNT-1));
 	}
+
+	public static AnimalActor getHiddenAnimal(BoardActor board) {
+		return new AnimalActor(board, -1);
+	}
 }

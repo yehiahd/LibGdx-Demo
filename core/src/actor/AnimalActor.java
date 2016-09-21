@@ -30,8 +30,7 @@ public class AnimalActor extends Actor {
 	public AnimalActor(ActorEventListener listener, int typeID){
 		AnimalActor.this.listener = listener;
         AnimalActor.this.typeID = typeID;
-		textureRegion = new TextureRegion(Assets.getInstance().getTextureAt(typeID));
-		setBounds(getX(), getY(), textureRegion.getRegionWidth(), textureRegion.getRegionHeight());
+		refreshTexture();
 		setTouchable(Touchable.enabled);
 	    prepareListener();
     }
@@ -107,23 +106,29 @@ public class AnimalActor extends Actor {
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		if (this.getTypeID() == -1){
-			this.addAction(Actions.alpha(0f, 0));
+		if (this.isHidden()){
+			if (this.getTableIndex() < table.getColumns())
+				this.replaceWithRandom();
+			else
+				this.addAction(Actions.alpha(0f, 0));
 			return;
 		}
 
 		AnimalActor predecessor = this.getPredecessor();
-		if (predecessor != null && predecessor.getTypeID() == -1  && !listener.isAnimating()) {
+		if (predecessor != null && predecessor.isHidden()/* && !listener.isAnimating()*/) {
 //			this.swapWith(predecessor, false);
 			this.swapTypeWith(predecessor);
 			return;
 		}
-//		super.draw(batch, parentAlpha);
 		Color color = getColor();
 		batch.setColor(color.r, color.g, color.b, color.a * parentAlpha);
 		batch.draw(textureRegion, getX(), getY(), getWidth() * getScaleX(),
 				getHeight() * getScaleY());
 		batch.setColor(color.r, color.g, color.b, 1f);
+	}
+
+	private boolean isHidden() {
+		return typeID == -1;
 	}
 
 	public void setTypeID(int typeID) {
@@ -165,6 +170,7 @@ public class AnimalActor extends Actor {
 		if (texture != null) {
 			this.addAction(Actions.alpha(1f, 0));
 			this.textureRegion = new TextureRegion(texture);
+			this.setBounds(getX(), getY(), textureRegion.getRegionWidth(), textureRegion.getRegionHeight());
 		}
 	}
 
@@ -188,8 +194,6 @@ public class AnimalActor extends Actor {
 							@Override
 							public void run() {
 								AnimalActor.this.swapTypeWith(that);
-//								if (!AnimalActor.this.isVisible() || !that.isVisible())
-//									AnimalActor.this.swapVisibility(that);
 							}
 						}),
 						Actions.alpha(1, 0.5f),
