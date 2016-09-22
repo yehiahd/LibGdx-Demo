@@ -1,7 +1,6 @@
 package actor;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
@@ -58,25 +57,22 @@ public class BoardActor extends Actor implements ActorEventListener {
 		for (final Iterator<AbstractAnimalActor> iterator = toBeRemoved.iterator(); iterator.hasNext(); ) {
 			final AbstractAnimalActor actor = iterator.next();
 			// TODO: 9/20/16 put explosive animation logic in a runnable action here to maintain the sequential behaviour.
-            actor.addAction(Actions.sequence(
-                    Actions.parallel(Actions.scaleBy(-0.5f, -0.5f, 0.3f),
-                            Actions.moveBy(10f,10f,0.3f)),
+			actor.addAction(Actions.sequence(
+					Actions.scaleBy(-0.5f, -0.5f, 1),
 					Actions.run(new Runnable() {
 						@Override
 						public void run() {
 							actor.destroy();
 						}
 					}),
-                    Actions.parallel(Actions.scaleBy(0.5f, 0.5f, 0.3f),
-                            Actions.moveBy(-10f,-10f,0.3f)),
-					new Action() {
+					Actions.scaleBy(0.5f, 0.5f, 1),
+					Actions.run(new Runnable() {
 						@Override
-						public boolean act(float delta) {
+						public void run() {
 							if (!iterator.hasNext())
 								animating = false;
-							return true;
 						}
-					}
+					})
 			));
 		}
 		if (!toBeRemoved.isEmpty())
@@ -203,7 +199,7 @@ public class BoardActor extends Actor implements ActorEventListener {
 		if (this.selectedActor != null){
 			if (actor.canSwap(this.selectedActor)) {
 //				actor.swapWith(this.selectedActor, true);
-				swap(this.selectedActor, actor);
+				swapContents(this.selectedActor, actor);
 			}
 			BoardActor.this.selectedActor = null;
 		} else {
@@ -211,7 +207,7 @@ public class BoardActor extends Actor implements ActorEventListener {
 		}
 	}
 
-	private void swap(AbstractAnimalActor first, AbstractAnimalActor second) {
+	private void swapContents(AbstractAnimalActor first, AbstractAnimalActor second) {
 		Cell<AbstractAnimalActor> cell = table.getCell(first);
 		Cell<AbstractAnimalActor> cell1 = table.getCell(second);
 
