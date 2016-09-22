@@ -64,7 +64,7 @@ public class BoardActor extends Actor implements ActorEventListener {
             // TODO: 9/20/16 put explosive animation logic in a runnable action here to maintain the sequential behaviour.
             actor.addAction(Actions.sequence(
                     Actions.parallel(Actions.scaleBy(-0.5f, -0.5f, 1),
-                            Actions.moveBy(10f,10f,1)),
+                            Actions.moveBy(11f,11f,1)),
                     new Action() {
                         @Override
                         public boolean act(float delta) {
@@ -74,7 +74,7 @@ public class BoardActor extends Actor implements ActorEventListener {
                         }
                     },
                     Actions.parallel(Actions.scaleBy(0.5f, 0.5f, 1),
-                            Actions.moveBy(-10f,-10f,1)),
+                            Actions.moveBy(-11f,-11f,1)),
                     new Action() {
                         @Override
                         public boolean act(float delta) {
