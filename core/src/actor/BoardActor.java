@@ -57,15 +57,17 @@ public class BoardActor extends Actor implements ActorEventListener {
 		for (final Iterator<AbstractAnimalActor> iterator = toBeRemoved.iterator(); iterator.hasNext(); ) {
 			final AbstractAnimalActor actor = iterator.next();
 			// TODO: 9/20/16 put explosive animation logic in a runnable action here to maintain the sequential behaviour.
-			actor.addAction(Actions.sequence(
-					Actions.scaleBy(-0.5f, -0.5f, 1),
+            actor.addAction(Actions.sequence(
+                    Actions.parallel(Actions.scaleBy(-0.5f, -0.5f, 1),
+                            Actions.moveBy(10f,10f,1)),
 					Actions.run(new Runnable() {
 						@Override
 						public void run() {
 							actor.destroy();
 						}
 					}),
-					Actions.scaleBy(0.5f, 0.5f, 1),
+                    Actions.parallel(Actions.scaleBy(0.5f, 0.5f, 1),
+                            Actions.moveBy(-10f,-10f,1)),
 					Actions.run(new Runnable() {
 						@Override
 						public void run() {
