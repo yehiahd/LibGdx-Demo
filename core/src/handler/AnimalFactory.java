@@ -1,6 +1,6 @@
 package handler;
 
-import actor.AnimalActor;
+import actor.NormalAnimalActor;
 import actor.BoardActor;
 import model.AnimalTypes;
 
@@ -8,16 +8,16 @@ import model.AnimalTypes;
  * Created by yehia on 05/09/16.
  */
 public class AnimalFactory {
-    public static AnimalActor getRandomizedAnimal(BoardActor board){
+    public static NormalAnimalActor getRandomizedAnimal(BoardActor board){
         int index = getRandomIndex();
-        return new AnimalActor(board, index);
+        return new NormalAnimalActor(board, index);
     }
 
 	public static int getRandomIndex() {
 		return (int)(Math.random() * (AnimalTypes.COUNT-1));
 	}
 
-	public static AnimalActor getHiddenAnimal(BoardActor board) {
-		return new AnimalActor(board, -1);
+	public static NormalAnimalActor getHiddenAnimal(BoardActor board) {
+		return new NormalAnimalActor(board, -1);
 	}
 }

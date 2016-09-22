@@ -18,7 +18,7 @@ import handler.AnimalFactory;
 public class BoardActor extends Actor implements ActorEventListener {
     private final int rows;
     private final int cols;
-	private AnimalActor selectedActor;
+	private AbstractAnimalActor selectedActor;
 	private Table table;
 	private boolean animating;
 
@@ -32,7 +32,7 @@ public class BoardActor extends Actor implements ActorEventListener {
     public void initialize() {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-	            AnimalActor actor = AnimalFactory.getRandomizedAnimal(this);
+	            NormalAnimalActor actor = AnimalFactory.getRandomizedAnimal(this);
 	            actor.setTable(table);
 	            table.add(actor);
             }
@@ -60,15 +60,15 @@ public class BoardActor extends Actor implements ActorEventListener {
 
 		for (final Iterator<Actor> iterator = toBeRemoved.iterator(); iterator.hasNext(); ) {
 			Actor actor = iterator.next();
-			final AnimalActor animalActor = (AnimalActor) actor;
+			final NormalAnimalActor normalAnimalActor = (NormalAnimalActor) actor;
 			// TODO: 9/20/16 put explosive animation logic in a runnable action here to maintain the sequential behaviour.
 			actor.addAction(Actions.sequence(
 					Actions.scaleBy(-0.5f, -0.5f, 1),
 					new Action() {
 						@Override
 						public boolean act(float delta) {
-							animalActor.hide();
-//							animalActor.replaceWithRandom();
+							normalAnimalActor.destroy();
+//							normalAnimalActor.replaceWithRandom();
 							return true;
 						}
 					},
@@ -122,7 +122,7 @@ public class BoardActor extends Actor implements ActorEventListener {
 		if (outOfBoundary(row, col))
 			return false;
 
-		AnimalActor current = getActorAt(row, col);
+		NormalAnimalActor current = getActorAt(row, col);
 		if (row > 1)
 			if (current.equals(getActorAt(row-1, col)) && current.equals(getActorAt(row-2, col))) {
 				toBeRemoved.add(getActorAt(row - 1, col));
@@ -174,8 +174,8 @@ public class BoardActor extends Actor implements ActorEventListener {
 		return !toBeRemoved.isEmpty();
 	}
 
-	private AnimalActor getActorAt(int row, int col) {
-		AnimalActor actor = (AnimalActor) table.getCells().get(table.getRows() * row + col).getActor();
+	private NormalAnimalActor getActorAt(int row, int col) {
+		NormalAnimalActor actor = (NormalAnimalActor) table.getCells().get(table.getRows() * row + col).getActor();
 		if (row != table.getCell(actor).getRow() || col != table.getCell(actor).getColumn())
 			Gdx.app.log("CONFLICT!", actor.toString());
 		return actor;
@@ -192,7 +192,7 @@ public class BoardActor extends Actor implements ActorEventListener {
 	}
 
 	@Override
-	public void onActorClicked(AnimalActor actor) {
+	public void onActorClicked(AbstractAnimalActor actor) {
 		if (this.selectedActor != null){
 			if (actor.canSwap(this.selectedActor)) {
 				animating = true;
