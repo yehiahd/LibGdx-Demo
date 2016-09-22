@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import callback.ActorEventListener;
@@ -168,45 +167,6 @@ public abstract class AbstractAnimalActor extends Actor {
 			return false;
 
 		return true;
-	}
-
-	public void swapWith(final AbstractAnimalActor that, final boolean fromUser) {
-		listener.setAnimating();
-
-		Cell<AbstractAnimalActor> cell = table.getCell(this);
-		Cell<AbstractAnimalActor> cell1 = table.getCell(that);
-		cell.clearActor();
-		cell.setActor(that);
-		cell1.clearActor();
-		cell1.setActor(this);
-//		this.addAction(
-//				Actions.sequence(
-//						Actions.alpha(0.4f, 0.5f),
-//						Actions.run(new Runnable() {
-//							@Override
-//							public void run() {
-////								AbstractAnimalActor.this.swapTypeWith(that);
-//							}
-//						}),
-//						Actions.alpha(1, 0.5f),
-//						Actions.run(new Runnable() {
-//							@Override
-//							public void run() {
-//								if (fromUser && !listener.checkMatches()) //if an actual user swap and there are no matches, swap them back.
-//									AbstractAnimalActor.this.swapWith(that, !fromUser);
-//								else {// we're done here.
-//									listener.clearAnimation();
-//								}
-//							}
-//						})
-//				)
-//		);
-//		that.addAction(
-//				Actions.sequence(
-//						Actions.alpha(0, 0.5f),
-//						Actions.alpha(1, 0.5f)
-//				)
-//		);
 	}
 
 //	private void swapTypeWith(AbstractAnimalActor that) {

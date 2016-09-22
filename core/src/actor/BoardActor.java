@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import java.util.HashSet;
@@ -203,11 +204,27 @@ public class BoardActor extends Actor implements ActorEventListener {
 	public void onActorClicked(AbstractAnimalActor actor) {
 		if (this.selectedActor != null){
 			if (actor.canSwap(this.selectedActor)) {
-				actor.swapWith(this.selectedActor, true);
+//				actor.swapWith(this.selectedActor, true);
+				swap(this.selectedActor, actor);
 			}
 			BoardActor.this.selectedActor = null;
 		} else {
 			this.selectedActor = actor;
+		}
+	}
+
+	private void swap(AbstractAnimalActor first, AbstractAnimalActor second) {
+		Cell<AbstractAnimalActor> cell = table.getCell(first);
+		Cell<AbstractAnimalActor> cell1 = table.getCell(second);
+
+		try {
+			NormalAnimalActor clone1 = (NormalAnimalActor) ((NormalAnimalActor)first).clone();
+			NormalAnimalActor clone2 = (NormalAnimalActor) ((NormalAnimalActor)second).clone();
+
+			cell.setActor(clone2);
+			cell1.setActor(clone1);
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
 		}
 	}
 

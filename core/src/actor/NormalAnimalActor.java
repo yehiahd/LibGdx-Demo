@@ -14,6 +14,13 @@ public class NormalAnimalActor extends AbstractAnimalActor {
     }
 
 	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		NormalAnimalActor newObj = new NormalAnimalActor(listener, getTypeID());
+		newObj.setTable(getTable());
+		return newObj;
+	}
+
+	@Override
 	public void destroy() {
 		listener.actorDestroyed(this);
 	}
