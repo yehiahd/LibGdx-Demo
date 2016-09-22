@@ -2,6 +2,7 @@ package com.ya.piratespigger;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -53,7 +54,7 @@ public class PiratesPigger extends ApplicationAdapter {
 		Drawer.draw(batch, width, height);
 		batch.end();
 
-		if (!board.isAnimating()/* && Gdx.input.isKeyPressed(Input.Keys.SPACE)*/)
+		if (!board.isAnimating() && Gdx.input.isKeyPressed(Input.Keys.SPACE))
 			board.removeMatches();
 
 		stage.act(Gdx.graphics.getDeltaTime());

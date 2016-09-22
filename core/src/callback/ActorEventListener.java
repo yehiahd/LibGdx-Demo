@@ -1,12 +1,12 @@
 package callback;
 
-import actor.AnimalActor;
+import actor.AbstractAnimalActor;
 
 /**
  * Created by ahmadz on 9/19/16.
  */
 public interface ActorEventListener {
-	void onActorClicked(AnimalActor actor);
+	void onActorClicked(AbstractAnimalActor actor);
 
 	void clearAnimation();
 
@@ -15,4 +15,6 @@ public interface ActorEventListener {
 	void setAnimating();
 
 	boolean isAnimating();
+
+	void actorDestroyed(AbstractAnimalActor actor);
 }
