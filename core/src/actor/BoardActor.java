@@ -32,7 +32,7 @@ public class BoardActor extends Actor implements ActorEventListener {
     public void initialize() {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-	            NormalAnimalActor actor = AnimalFactory.getRandomizedAnimal(this);
+	            AbstractAnimalActor actor = AnimalFactory.getRandomizedAnimal(this);
 	            actor.setTable(table);
 	            table.add(actor);
             }
@@ -43,13 +43,13 @@ public class BoardActor extends Actor implements ActorEventListener {
 	/**
 	 * the list which stores the actors to be removed by removeMatches().
 	 */
-	HashSet<Actor> toBeRemoved;
+	HashSet<AbstractAnimalActor> toBeRemoved;
 
 	/**
 	 * replaces with animation the matched actors.
 	 */
 	public void removeMatches(){
-		toBeRemoved = new HashSet<Actor>();
+		toBeRemoved = new HashSet<AbstractAnimalActor>();
 
 		checkMatches(false);
 
@@ -58,20 +58,17 @@ public class BoardActor extends Actor implements ActorEventListener {
 			animating = true;
 		}
 
-		for (final Iterator<Actor> iterator = toBeRemoved.iterator(); iterator.hasNext(); ) {
-			Actor actor = iterator.next();
-			final NormalAnimalActor normalAnimalActor = (NormalAnimalActor) actor;
+		for (final Iterator<AbstractAnimalActor> iterator = toBeRemoved.iterator(); iterator.hasNext(); ) {
+			final AbstractAnimalActor actor = iterator.next();
 			// TODO: 9/20/16 put explosive animation logic in a runnable action here to maintain the sequential behaviour.
 			actor.addAction(Actions.sequence(
 					Actions.scaleBy(-0.5f, -0.5f, 1),
-					new Action() {
+					Actions.run(new Runnable() {
 						@Override
-						public boolean act(float delta) {
-							normalAnimalActor.destroy();
-//							normalAnimalActor.replaceWithRandom();
-							return true;
+						public void run() {
+							actor.destroy();
 						}
-					},
+					}),
 					Actions.scaleBy(0.5f, 0.5f, 1),
 					new Action() {
 						@Override
@@ -88,6 +85,17 @@ public class BoardActor extends Actor implements ActorEventListener {
 		toBeRemoved.clear();
 	}
 
+	@Override
+	public void actorDestroyed(AbstractAnimalActor actor) {
+		replaceWithGap(actor);
+	}
+
+	private void replaceWithGap(AbstractAnimalActor actor) {
+		int tableIndex = actor.getTableIndex();
+		table.removeActor(actor);
+		table.addActorAt(tableIndex, AnimalFactory.getHiddenAnimal(this));
+	}
+
 	/**
 	 *
 	 * @return whether the whole grid contains a match or not.
@@ -95,7 +103,7 @@ public class BoardActor extends Actor implements ActorEventListener {
 
 	@Override
 	public boolean checkMatches() {
-		toBeRemoved = new HashSet<Actor>();
+		toBeRemoved = new HashSet<AbstractAnimalActor>();
 		return checkMatches(true);
 	}
 
@@ -122,7 +130,7 @@ public class BoardActor extends Actor implements ActorEventListener {
 		if (outOfBoundary(row, col))
 			return false;
 
-		NormalAnimalActor current = getActorAt(row, col);
+		AbstractAnimalActor current = getActorAt(row, col);
 		if (row > 1)
 			if (current.equals(getActorAt(row-1, col)) && current.equals(getActorAt(row-2, col))) {
 				toBeRemoved.add(getActorAt(row - 1, col));
@@ -174,8 +182,8 @@ public class BoardActor extends Actor implements ActorEventListener {
 		return !toBeRemoved.isEmpty();
 	}
 
-	private NormalAnimalActor getActorAt(int row, int col) {
-		NormalAnimalActor actor = (NormalAnimalActor) table.getCells().get(table.getRows() * row + col).getActor();
+	private AbstractAnimalActor getActorAt(int row, int col) {
+		AbstractAnimalActor actor = (AbstractAnimalActor) table.getCells().get(table.getRows() * row + col).getActor();
 		if (row != table.getCell(actor).getRow() || col != table.getCell(actor).getColumn())
 			Gdx.app.log("CONFLICT!", actor.toString());
 		return actor;
@@ -195,13 +203,12 @@ public class BoardActor extends Actor implements ActorEventListener {
 	public void onActorClicked(AbstractAnimalActor actor) {
 		if (this.selectedActor != null){
 			if (actor.canSwap(this.selectedActor)) {
-				animating = true;
 				actor.swapWith(this.selectedActor, true);
 			}
 			BoardActor.this.selectedActor = null;
-		}
-		else
+		} else {
 			this.selectedActor = actor;
+		}
 	}
 
 	private boolean outOfBoundary(int row, int col) {

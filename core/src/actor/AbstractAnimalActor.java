@@ -9,11 +9,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import callback.ActorEventListener;
-import handler.Assets;
 import model.AnimalTypes;
 
 /**
@@ -23,12 +22,12 @@ public abstract class AbstractAnimalActor extends Actor {
 	private TextureRegion textureRegion;
 	private int typeID;
 	private Table table;
+	protected ActorEventListener listener;
 
-	private ActorEventListener listener;
-	public AbstractAnimalActor(ActorEventListener listener, int typeID){
+	protected AbstractAnimalActor(ActorEventListener listener, int typeID){
 		this.listener = listener;
 		this.typeID = typeID;
-		refreshTexture();
+//		refreshTexture();
 		setTouchable(Touchable.enabled);
 		prepareListener();
 	}
@@ -37,7 +36,7 @@ public abstract class AbstractAnimalActor extends Actor {
 		InputListener inputListener = new InputListener() {
 			@Override
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-				Gdx.app.log("touchDown: ", this.toString());
+				Gdx.app.log("touchDown: ", AbstractAnimalActor.this.toString());
 				listener.onActorClicked(AbstractAnimalActor.this);
 				return true;
 			}
@@ -114,6 +113,12 @@ public abstract class AbstractAnimalActor extends Actor {
 				getHeight() * getScaleY());
 		batch.setColor(color.r, color.g, color.b, 1f);
 	}
+
+	public void setTextureRegion(Texture texture, boolean visible) {
+		this.textureRegion = new TextureRegion(texture);
+		this.setBounds(getX(), getY(), textureRegion.getRegionWidth(), textureRegion.getRegionHeight());
+		this.setVisible(visible);
+	}
 //
 //	public void setTypeID(int typeID) {
 //		this.typeID = typeID;
@@ -144,14 +149,12 @@ public abstract class AbstractAnimalActor extends Actor {
 //		setTypeID(typeID);
 //		refreshTexture();
 //	}
-
-	public void refreshTexture() {
-		Texture texture = Assets.getInstance().getTextureAt(this.typeID);
-		if (texture != null) {
-			this.textureRegion = new TextureRegion(texture);
-			this.setBounds(getX(), getY(), textureRegion.getRegionWidth(), textureRegion.getRegionHeight());
-		}
-	}
+//	public void refreshTexture() {
+//		Texture texture = Assets.getInstance().getTextureAt(this.typeID);
+//		if (texture != null) {
+//			this.textureRegion = new TextureRegion(texture);
+//		}
+//	}
 
 	public TextureRegion getTexture(){
 		return this.textureRegion;
@@ -170,34 +173,40 @@ public abstract class AbstractAnimalActor extends Actor {
 	public void swapWith(final AbstractAnimalActor that, final boolean fromUser) {
 		listener.setAnimating();
 
-		this.addAction(
-				Actions.sequence(
-						Actions.alpha(0.4f, 0.5f),
-						Actions.run(new Runnable() {
-							@Override
-							public void run() {
-//								AbstractAnimalActor.this.swapTypeWith(that);
-							}
-						}),
-						Actions.alpha(1, 0.5f),
-						Actions.run(new Runnable() {
-							@Override
-							public void run() {
-								if (fromUser && !listener.checkMatches()) //if an actual user swap and there are no matches, swap them back.
-									AbstractAnimalActor.this.swapWith(that, !fromUser);
-								else {// we're done here.
-									listener.clearAnimation();
-								}
-							}
-						})
-				)
-		);
-		that.addAction(
-				Actions.sequence(
-						Actions.alpha(0, 0.5f),
-						Actions.alpha(1, 0.5f)
-				)
-		);
+		Cell<AbstractAnimalActor> cell = table.getCell(this);
+		Cell<AbstractAnimalActor> cell1 = table.getCell(that);
+		cell.clearActor();
+		cell.setActor(that);
+		cell1.clearActor();
+		cell1.setActor(this);
+//		this.addAction(
+//				Actions.sequence(
+//						Actions.alpha(0.4f, 0.5f),
+//						Actions.run(new Runnable() {
+//							@Override
+//							public void run() {
+////								AbstractAnimalActor.this.swapTypeWith(that);
+//							}
+//						}),
+//						Actions.alpha(1, 0.5f),
+//						Actions.run(new Runnable() {
+//							@Override
+//							public void run() {
+//								if (fromUser && !listener.checkMatches()) //if an actual user swap and there are no matches, swap them back.
+//									AbstractAnimalActor.this.swapWith(that, !fromUser);
+//								else {// we're done here.
+//									listener.clearAnimation();
+//								}
+//							}
+//						})
+//				)
+//		);
+//		that.addAction(
+//				Actions.sequence(
+//						Actions.alpha(0, 0.5f),
+//						Actions.alpha(1, 0.5f)
+//				)
+//		);
 	}
 
 //	private void swapTypeWith(AbstractAnimalActor that) {

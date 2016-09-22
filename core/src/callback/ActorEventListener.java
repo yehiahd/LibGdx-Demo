@@ -15,4 +15,6 @@ public interface ActorEventListener {
 	void setAnimating();
 
 	boolean isAnimating();
+
+	void actorDestroyed(AbstractAnimalActor actor);
 }
