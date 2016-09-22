@@ -17,20 +17,16 @@ import handler.AnimalFactory;
  * Created by yehia on 05/09/16.
  */
 public class BoardActor extends Actor implements ActorEventListener {
-    private final int rows;
-    private final int cols;
 	private AbstractAnimalActor selectedActor;
 	private Table table;
 	private boolean animating;
 
 	public BoardActor(int rows, int cols, Table table) {
-        this.rows = rows;
-        this.cols = cols;
 		this.table = table;
-		initialize();
+		initialize(rows, cols);
 	}
 
-    public void initialize() {
+    public void initialize(int rows, int cols) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
 	            AbstractAnimalActor actor = AnimalFactory.getRandomizedAnimal(this);
@@ -110,8 +106,8 @@ public class BoardActor extends Actor implements ActorEventListener {
 
 	public boolean checkMatches(boolean clearAfter) {
 		boolean result;
-		for (int i = 0; i < rows; i++)
-			for (int j = 0; j < cols; j++)
+		for (int i = 0; i < table.getRows(); i++)
+			for (int j = 0; j < table.getColumns(); j++)
 				checkMatches(i, j);
 
 		result = toBeRemoved.size() > 0;
@@ -138,7 +134,7 @@ public class BoardActor extends Actor implements ActorEventListener {
 				toBeRemoved.add(getActorAt(row - 2, col));
 			}
 
-		if (row+2 < rows)
+		if (row+2 < table.getRows())
 			if (current.equals(getActorAt(row+1, col)) && current.equals(getActorAt(row+2, col))) {
 				toBeRemoved.add(getActorAt(row + 1, col));
 				toBeRemoved.add(getActorAt(row + 2, col));
@@ -150,7 +146,7 @@ public class BoardActor extends Actor implements ActorEventListener {
 				toBeRemoved.add(getActorAt(row, col - 2));
 			}
 
-		if (col+2 < cols)
+		if (col+2 < table.getColumns())
 			if (current.equals(getActorAt(row, col+1)) && current.equals(getActorAt(row, col+2))) {
 				toBeRemoved.add(getActorAt(row, col + 1));
 				toBeRemoved.add(getActorAt(row, col + 2));
@@ -162,7 +158,7 @@ public class BoardActor extends Actor implements ActorEventListener {
 				toBeRemoved.add(getActorAt(row - 2, col));
 			}
 
-		if (row+2 < rows)
+		if (row+2 < table.getRows())
 			if (current.equals(getActorAt(row+1, col)) && current.equals(getActorAt(row+2, col))) {
 				toBeRemoved.add(getActorAt(row + 1, col));
 				toBeRemoved.add(getActorAt(row + 2, col));
@@ -174,7 +170,7 @@ public class BoardActor extends Actor implements ActorEventListener {
 				toBeRemoved.add(getActorAt(row, col - 2));
 			}
 
-		if (col+2 < cols)
+		if (col+2 < table.getColumns())
 			if (current.equals(getActorAt(row, col+1)) && current.equals(getActorAt(row, col+2))) {
 				toBeRemoved.add(getActorAt(row, col + 1));
 				toBeRemoved.add(getActorAt(row, col + 2));
@@ -229,7 +225,7 @@ public class BoardActor extends Actor implements ActorEventListener {
 	}
 
 	private boolean outOfBoundary(int row, int col) {
-		return row >= rows || col >= cols || row < 0 || col < 0;
+		return row >= table.getRows() || col >= table.getColumns() || row < 0 || col < 0;
 	}
 
 	@Override
