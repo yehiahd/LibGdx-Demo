@@ -58,16 +58,16 @@ public class BoardActor extends Actor implements ActorEventListener {
 			final AbstractAnimalActor actor = iterator.next();
 			// TODO: 9/20/16 put explosive animation logic in a runnable action here to maintain the sequential behaviour.
             actor.addAction(Actions.sequence(
-                    Actions.parallel(Actions.scaleBy(-0.5f, -0.5f, 1),
-                            Actions.moveBy(10f,10f,1)),
+                    Actions.parallel(Actions.scaleBy(-0.5f, -0.5f, 0.5f),
+                            Actions.moveBy(12f,12f,0.5f)),
 					Actions.run(new Runnable() {
 						@Override
 						public void run() {
 							actor.destroy();
 						}
 					}),
-                    Actions.parallel(Actions.scaleBy(0.5f, 0.5f, 1),
-                            Actions.moveBy(-10f,-10f,1)),
+                    Actions.sequence(Actions.parallel(Actions.scaleBy(0.5f, 0.5f, 0.5f),
+                            Actions.moveBy(-12f,-12f,0.5f))),
 					Actions.run(new Runnable() {
 						@Override
 						public void run() {
